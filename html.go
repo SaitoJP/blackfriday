@@ -793,7 +793,7 @@ func (r *HTMLRenderer) RenderNode(w io.Writer, node *Node, entering bool) WalkSt
 				attrs = append(attrs, fmt.Sprintf(`align="%s"`, align))
 			}
 
-			attrs = append(attrs, fmt.Sprintf(`width="%spx"`, strconv.Itoa(node.Space)))
+			attrs = append(attrs, fmt.Sprintf(`width="%spx"`, strconv.Itoa(node.Space*30)))
 
 			if node.Prev == nil {
 				r.cr(w)
