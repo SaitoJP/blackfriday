@@ -783,7 +783,7 @@ func isBackslashEscaped(data []byte, i int) bool {
 	return backslashes&1 == 1
 }
 
-func (p *Markdown) tableHeader(data []byte) (size int, columns []CellAlignFlags) {
+func (p *Markdown) tableHeader(data []byte) (size int, columns []map[string]int) {
 	i := 0
 	colCount := 1
 	for i = 0; i < len(data) && data[i] != '\n'; i++ {
@@ -812,7 +812,7 @@ func (p *Markdown) tableHeader(data []byte) (size int, columns []CellAlignFlags)
 		colCount--
 	}
 
-	columns = make([]CellAlignFlags, colCount)
+	columns = make([]map[string]int, colCount)
 
 	// move on to the header underline
 	i++
@@ -829,20 +829,22 @@ func (p *Markdown) tableHeader(data []byte) (size int, columns []CellAlignFlags)
 	// and trailing | optional on last column
 	col := 0
 	for i < len(data) && data[i] != '\n' {
+		columns[col] = map[string]int{"align": 0, "space": 0}
 		dashes := 0
 
 		if data[i] == ':' {
 			i++
-			columns[col] |= TableAlignmentLeft
+			columns[col]["align"] |= TableAlignmentLeft
 			dashes++
 		}
 		for i < len(data) && data[i] == '-' {
 			i++
 			dashes++
+			columns[col]["space"]++
 		}
 		if i < len(data) && data[i] == ':' {
 			i++
-			columns[col] |= TableAlignmentRight
+			columns[col]["align"] |= TableAlignmentRight
 			dashes++
 		}
 		for i < len(data) && data[i] == ' ' {
@@ -896,7 +898,7 @@ func (p *Markdown) tableHeader(data []byte) (size int, columns []CellAlignFlags)
 	return
 }
 
-func (p *Markdown) tableRow(data []byte, columns []CellAlignFlags, header bool) {
+func (p *Markdown) tableRow(data []byte, columns []map[string]int, header bool) {
 	p.addBlock(TableRow, nil)
 	i, col := 0, 0
 
@@ -926,14 +928,16 @@ func (p *Markdown) tableRow(data []byte, columns []CellAlignFlags, header bool) 
 
 		cell := p.addBlock(TableCell, data[cellStart:cellEnd])
 		cell.IsHeader = header
-		cell.Align = columns[col]
+		cell.Align = columns[col]["align"]
+		cell.Space = columns[col]["space"]
 	}
 
 	// pad it out with empty columns to get the right number
 	for ; col < len(columns); col++ {
 		cell := p.addBlock(TableCell, nil)
 		cell.IsHeader = header
-		cell.Align = columns[col]
+		cell.Align = columns[col]["align"]
+		cell.Space = columns[col]["space"]
 	}
 
 	// silently ignore rows with too many cells

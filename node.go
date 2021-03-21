@@ -98,8 +98,9 @@ type CodeBlockData struct {
 
 // TableCellData contains fields relevant to a TableCell node type.
 type TableCellData struct {
-	IsHeader bool           // This tells if it's under the header row
-	Align    CellAlignFlags // This holds the value for align attribute
+	IsHeader bool // This tells if it's under the header row
+	Align    int  // This holds the value for align attribute
+	Space    int  // This is column width
 }
 
 // HeadingData contains fields relevant to a Heading node type.

@@ -72,14 +72,11 @@ const (
 	ListItemEndOfList
 )
 
-// CellAlignFlags holds a type of alignment in a table cell.
-type CellAlignFlags int
-
 // These are the possible flag values for the table cell renderer.
 // Only a single one of these values will be used; they are not ORed together.
 // These are mostly of interest if you are writing a new output format.
 const (
-	TableAlignmentLeft CellAlignFlags = 1 << iota
+	TableAlignmentLeft int = 1 << iota
 	TableAlignmentRight
 	TableAlignmentCenter = (TableAlignmentLeft | TableAlignmentRight)
 )

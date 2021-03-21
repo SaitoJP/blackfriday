@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -372,7 +373,7 @@ func skipParagraphTags(node *Node) bool {
 	return grandparent.Type == List && tightOrTerm
 }
 
-func cellAlignment(align CellAlignFlags) string {
+func cellAlignment(align int) string {
 	switch align {
 	case TableAlignmentLeft:
 		return "left"
@@ -791,6 +792,9 @@ func (r *HTMLRenderer) RenderNode(w io.Writer, node *Node, entering bool) WalkSt
 			if align != "" {
 				attrs = append(attrs, fmt.Sprintf(`align="%s"`, align))
 			}
+
+			attrs = append(attrs, fmt.Sprintf(`width="%spx"`, strconv.Itoa(node.Space)))
+
 			if node.Prev == nil {
 				r.cr(w)
 			}
