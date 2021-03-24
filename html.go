@@ -320,6 +320,23 @@ func isSmartypantable(node *Node) bool {
 	return pt != Link && pt != CodeBlock && pt != Code
 }
 
+func languageFilename(info []byte) string {
+	if len(info) == 0 {
+		return ""
+	}
+	endOfLang := bytes.IndexAny(info, "\t ")
+	if endOfLang < 0 {
+		endOfLang = len(info)
+	}
+	languageWithFilename := string(info[:endOfLang])
+	array := strings.Split(languageWithFilename, ":")
+	if len(array) > 1 {
+		filename := array[1]
+		return filename
+	}
+	return ""
+}
+
 func appendLanguageAttr(attrs []string, info []byte) []string {
 	if len(info) == 0 {
 		return attrs
@@ -767,8 +784,14 @@ func (r *HTMLRenderer) RenderNode(w io.Writer, node *Node, entering bool) WalkSt
 		}
 	case CodeBlock:
 		attrs = appendLanguageAttr(attrs, node.Info)
+		codeFilename := languageFilename(node.Info)
 		r.cr(w)
 		r.out(w, preTag)
+		if codeFilename != "" {
+			r.out(w, []byte("<span class=\"code-filename\">"))
+			r.out(w, []byte(codeFilename))
+			r.out(w, []byte("</span>"))
+		}
 		r.tag(w, codeTag[:len(codeTag)-1], attrs)
 		escapeAllHTML(w, node.Literal)
 		r.out(w, codeCloseTag)
