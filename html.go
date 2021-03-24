@@ -328,7 +328,11 @@ func appendLanguageAttr(attrs []string, info []byte) []string {
 	if endOfLang < 0 {
 		endOfLang = len(info)
 	}
-	return append(attrs, fmt.Sprintf("class=\"language-%s\"", info[:endOfLang]))
+	languageWithFilename := string(info[:endOfLang])
+	array := strings.Split(languageWithFilename, ":")
+	language := array[0]
+
+	return append(attrs, fmt.Sprintf("class=\"language-%s\"", language))
 }
 
 func (r *HTMLRenderer) tag(w io.Writer, name []byte, attrs []string) {
